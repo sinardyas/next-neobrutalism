@@ -139,9 +139,40 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
+import { z } from 'zod';
+import { useForm } from "react-hook-form";
+import { zodResolver } from '@hookform/resolvers/zod';
+
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+
+
+const formSchema =  z.object({
+  username: z.string().min(2).max(50),
+});
+
+
 export default function Home() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [isOpen, setIsOpen] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log(values);
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -556,6 +587,28 @@ export default function Home() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+
+        <div className="w-1/2">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 font-bold">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ekmas" {...field} />
+                    </FormControl>
+                    <FormDescription>This is your public display name.</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Submit</Button>
+            </form>
+          </Form>
         </div>
       </div>
     </main>
